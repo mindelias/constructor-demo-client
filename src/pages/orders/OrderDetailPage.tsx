@@ -170,45 +170,55 @@ export function OrderDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {order.items.map((item, index) => (
-                    <div key={index}>
-                      <div className="flex gap-4">
-                        {/* Product Image */}
-                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                          {item.imageUrl && (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.name}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
+                  {order.items.map((item, index) => {
+                    // Handle both backend formats: productId (object) and product (string)
+                    const productData = typeof item.productId === 'object' ? item.productId :
+                                       typeof item.product === 'object' ? item.product : null;
+                    const productName = item.name || productData?.name || 'Product';
+                    const productImage = item.imageUrl ||
+                                        (productData?.images && productData.images[0]) ||
+                                        productData?.imageUrl || '';
 
-                        {/* Product Details */}
-                        <div className="flex flex-1 flex-col justify-between">
-                          <div>
-                            <p className="font-semibold">{item.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              Qty: {item.quantity}
+                    return (
+                      <div key={index}>
+                        <div className="flex gap-4">
+                          {/* Product Image */}
+                          <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                            {productImage && (
+                              <img
+                                src={productImage}
+                                alt={productName}
+                                className="h-full w-full object-cover"
+                              />
+                            )}
+                          </div>
+
+                          {/* Product Details */}
+                          <div className="flex flex-1 flex-col justify-between">
+                            <div>
+                              <p className="font-semibold">{productName}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Qty: {item.quantity}
+                              </p>
+                            </div>
+                            <p className="font-medium text-primary">
+                              {formatPrice(item.price)}
                             </p>
                           </div>
-                          <p className="font-medium text-primary">
-                            {formatPrice(item.price)}
-                          </p>
-                        </div>
 
-                        {/* Item Total */}
-                        <div className="text-right">
-                          <p className="font-semibold">
-                            {formatPrice(item.price * item.quantity)}
-                          </p>
+                          {/* Item Total */}
+                          <div className="text-right">
+                            <p className="font-semibold">
+                              {formatPrice(item.price * item.quantity)}
+                            </p>
+                          </div>
                         </div>
+                        {index < order.items.length - 1 && (
+                          <Separator className="mt-4" />
+                        )}
                       </div>
-                      {index < order.items.length - 1 && (
-                        <Separator className="mt-4" />
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -252,34 +262,58 @@ export function OrderDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {order.statusHistory
-                    .slice()
-                    .reverse()
-                    .map((history, index) => {
-                      const Icon = statusIcons[history.status];
-                      const color = statusColors[history.status];
+                  {order.statusHistory && order.statusHistory.length > 0 ? (
+                    // Show full timeline if statusHistory exists
+                    order.statusHistory
+                      .slice()
+                      .reverse()
+                      .map((history, index) => {
+                        const Icon = statusIcons[history.status];
+                        const color = statusColors[history.status];
 
-                      return (
-                        <div key={index} className="flex gap-4">
-                          <div className={`flex-shrink-0 ${color}`}>
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold capitalize">
-                              {history.status}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(history.timestamp).toLocaleString()}
-                            </p>
-                            {history.note && (
-                              <p className="mt-1 text-sm text-muted-foreground">
-                                {history.note}
+                        return (
+                          <div key={index} className="flex gap-4">
+                            <div className={`flex-shrink-0 ${color}`}>
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold capitalize">
+                                {history.status}
                               </p>
-                            )}
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(history.timestamp).toLocaleString()}
+                              </p>
+                              {history.note && (
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                  {history.note}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                  ) : (
+                    // Fallback: Show current status only if no history
+                    <div className="flex gap-4">
+                      <div className={`flex-shrink-0 ${statusColors[order.status]}`}>
+                        {(() => {
+                          const Icon = statusIcons[order.status];
+                          return <Icon className="h-5 w-5" />;
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold capitalize">
+                          {order.status}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(order.createdAt).toLocaleString()}
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Order placed
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -296,31 +330,37 @@ export function OrderDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">
-                      {formatPrice(order.subtotal)}
-                    </span>
-                  </div>
+                  {/* Only show breakdown if subtotal/tax/shipping exist */}
+                  {order.subtotal !== undefined && order.tax !== undefined && order.shippingCost !== undefined ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span className="font-medium">
+                          {formatPrice(order.subtotal)}
+                        </span>
+                      </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tax</span>
-                    <span className="font-medium">{formatPrice(order.tax)}</span>
-                  </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Tax</span>
+                        <span className="font-medium">{formatPrice(order.tax)}</span>
+                      </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium">
-                      {formatPrice(order.shippingCost)}
-                    </span>
-                  </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Shipping</span>
+                        <span className="font-medium">
+                          {formatPrice(order.shippingCost)}
+                        </span>
+                      </div>
 
-                  <Separator />
+                      <Separator />
+                    </>
+                  ) : null}
 
                   <div className="flex justify-between text-lg">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-primary">
-                      {formatPrice(order.total)}
+                      {/* Use totalAmount if total doesn't exist (backend compatibility) */}
+                      {formatPrice(order.total ?? order.totalAmount ?? 0)}
                     </span>
                   </div>
                 </div>

@@ -60,12 +60,16 @@ export function CheckoutPage() {
         quantity: item.quantity,
       }));
 
-      await createOrderMutation.mutateAsync({
+      const order = await createOrderMutation.mutateAsync({
         items: orderItems,
         shippingAddress: data.shippingAddress,
+        paymentMethod: 'simulated', // Simulated payment
       });
 
-      toast.success('Order placed successfully!');
+      // Note: useCreateOrder hook will clear cart automatically
+      // Redirect to payment verification page (overrides hook's navigation)
+      toast.success('Order created! Processing payment...');
+      navigate(`/payment/verify/${order._id}`);
     } catch (error: unknown) {
       // Safely extract error message from various error shapes
       const err = error as unknown as { response?: { data?: { message?: string } } };

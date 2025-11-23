@@ -19,13 +19,15 @@ import type { CheckoutFormData } from '@/types/api.types';
 // Validation schema
 const checkoutSchema = z.object({
   shippingAddress: z.object({
-    street: z.string().min(2, 'street must be at least 2 characters'),
-    state: z.string().min(5, 'Address must be at least 5 characters'),
+    fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
+    address: z.string().min(5, 'Address must be at least 5 characters').optional(),
+    street: z.string().min(2, 'Street must be at least 2 characters'),
+    state: z.string().min(2, 'State is required'),
     city: z.string().min(2, 'City must be at least 2 characters'),
-    zipCode: z.string().min(3, 'Postal code is required'),
+    postalCode: z.string().min(3, 'Postal code is required').optional(),
+    zipCode: z.string().min(3, 'Zip code is required'),
     country: z.string().min(2, 'Country is required'),
     phone: z.string().optional(),
-     
   }),
 });
 
@@ -108,10 +110,25 @@ export function CheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="street">Full Name</Label>
+                    <Label htmlFor="fullName">Full Name (Optional)</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="John Doe"
+                      {...register('shippingAddress.fullName')}
+                      disabled={isSubmitting}
+                    />
+                    {errors.shippingAddress?.fullName && (
+                      <p className="text-sm text-destructive">
+                        {errors.shippingAddress.fullName.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="street">Street Address</Label>
                     <Input
                       id="street"
-                      placeholder="John Doe"
+                      placeholder="123 Main St"
                       {...register('shippingAddress.street')}
                       disabled={isSubmitting}
                     />
@@ -123,10 +140,10 @@ export function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="state">Address</Label>
+                    <Label htmlFor="state">State/Province</Label>
                     <Input
                       id="state"
-                      placeholder="123 Main St"
+                      placeholder="California"
                       {...register('shippingAddress.state')}
                       disabled={isSubmitting}
                     />

@@ -11,10 +11,6 @@ export function CartPage() {
   const navigate = useNavigate();
   const { items } = useCartStore();
 
-  console.log('====================================');
-  console.log('ITEMS', items);
-  console.log('====================================');
-
   const isEmpty = items.length === 0;
 
   return (

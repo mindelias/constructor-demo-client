@@ -16,7 +16,7 @@ export function CartItem({ item }: CartItemProps) {
   const { product, quantity } = item;
 
   const handleIncrement = () => {
-    if (quantity < product.stock) {
+    if (quantity < product.inventory) {
       updateQuantity(product._id, quantity + 1);
     }
   };
@@ -96,7 +96,7 @@ export function CartItem({ item }: CartItemProps) {
                   size="icon"
                   className="h-8 w-8"
                   onClick={handleIncrement}
-                  disabled={quantity >= product.stock}
+                  disabled={quantity >= product.inventory}
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -134,7 +134,7 @@ export function CartItem({ item }: CartItemProps) {
                   size="icon"
                   className="h-8 w-8"
                   onClick={handleIncrement}
-                  disabled={quantity >= product.stock}
+                  disabled={quantity >= product.inventory}
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -163,9 +163,9 @@ export function CartItem({ item }: CartItemProps) {
           </div>
 
           {/* Stock Warning */}
-          {quantity >= product.stock && (
+          {quantity >= product.inventory && (
             <p className="mt-2 text-xs text-yellow-600 dark:text-yellow-500">
-              Maximum quantity available: {product.stock}
+              Maximum quantity available: {product.inventory}
             </p>
           )}
         </CardContent>

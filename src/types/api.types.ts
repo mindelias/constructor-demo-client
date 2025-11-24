@@ -70,7 +70,7 @@ export interface Product {
   images?: string[]; // Backend uses 'images' array
   inventory: number;
   tags?: string[]; // Backend includes tags
-  features?: Record<string, any>; // Backend includes features
+  features?: Record<string, unknown>; // Backend includes features
   stats: ProductStats;
   numReviews?: number; // Optional - may use stats.reviewCount instead
   createdAt: string;

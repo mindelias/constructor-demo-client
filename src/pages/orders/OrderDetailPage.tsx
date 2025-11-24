@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -29,7 +29,8 @@ import {
 import { toast } from 'sonner';
 import type { OrderStatus } from '@/types/api.types';
 
-const statusIcons: Record<OrderStatus, any> = {
+type IconType = (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+const statusIcons: Record<OrderStatus, unknown> = {
   pending: Clock,
   processing: Package,
   shipped: Truck,
@@ -60,7 +61,7 @@ export function OrderDetailPage() {
     connectSocket();
 
     // Subscribe to order updates
-    const handleOrderUpdate = (data: any) => {
+    const handleOrderUpdate = (data: { status: OrderStatus }) => {
       toast.info(`Order status updated to: ${data.status}`);
 
       // Invalidate query to refetch order
@@ -268,7 +269,7 @@ export function OrderDetailPage() {
                       .slice()
                       .reverse()
                       .map((history, index) => {
-                        const Icon = statusIcons[history.status];
+                        const Icon = statusIcons[history.status] as unknown as IconType;
                         const color = statusColors[history.status];
 
                         return (
@@ -297,7 +298,7 @@ export function OrderDetailPage() {
                     <div className="flex gap-4">
                       <div className={`flex-shrink-0 ${statusColors[order.status]}`}>
                         {(() => {
-                          const Icon = statusIcons[order.status];
+                          const Icon = statusIcons[order.status] as unknown as IconType;
                           return <Icon className="h-5 w-5" />;
                         })()}
                       </div>

@@ -178,7 +178,7 @@ export interface CreateOrderRequest {
     quantity: number;
   }>;
   shippingAddress: ShippingAddress;
-  paymentMethod?: 'credit_card' | 'paypal' | 'cash_on_delivery'; // For payment simulation
+  paymentMethod?: 'credit_card' | 'paypal' | 'cash_on_delivery' | 'simulated'; // For payment simulation
 }
 
 // ===========================

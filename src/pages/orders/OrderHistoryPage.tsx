@@ -48,7 +48,7 @@ export function OrderHistoryPage() {
                 Failed to load orders
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                {(error as any)?.message || 'Please try again later'}
+                {error instanceof Error ? error.message : typeof error === 'string' ? error : 'Please try again later'}
               </p>
             </CardContent>
           </Card>

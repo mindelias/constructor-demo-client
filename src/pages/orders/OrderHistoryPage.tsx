@@ -126,7 +126,7 @@ export function OrderHistoryPage() {
                           <div className="text-right">
                             <p className="text-sm text-muted-foreground">Total</p>
                             <p className="text-xl font-bold text-primary">
-                              {formatPrice(order.total ?? order.totalAmount ?? 0)}
+                              {formatPrice(order.totalAmount ?? 0)}
                             </p>
                           </div>
 

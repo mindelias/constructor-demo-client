@@ -19,36 +19,58 @@ export function PaymentVerifyPage() {
   useEffect(() => {
     if (!orderId) return;
 
+    console.log('🔧 Payment Verification Started');
+    console.log('📦 Order ID:', orderId);
+
     // Initialize Socket.IO
     const token = localStorage.getItem('auth_token') || undefined;
+    console.log('🔑 Auth Token:', token ? '✅ Present' : '❌ Missing');
+
     initializeSocket(token);
     connectSocket();
 
     const socket = getSocket();
 
     if (!socket) {
+      console.error('❌ Socket connection failed');
       setStatus('failed');
       setMessage('Connection error. Please try again.');
       return;
     }
 
+    console.log('✅ Socket initialized');
+    console.log('🆔 Socket ID:', socket.id);
+    console.log('🔌 Socket connected:', socket.connected);
+
     // Subscribe to order updates
     socket.emit('subscribe:order', orderId);
+    console.log('📡 Subscribed to order updates for:', orderId);
+
+    // Debug: Log ALL Socket.IO events
+    socket.onAny((eventName, ...args) => {
+      console.log('📬 Socket Event:', eventName, args);
+    });
 
     // Listen for order updates
     const handleOrderUpdate = (data: any) => {
-      console.log('📨 Payment update received:', data);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🎯 PAYMENT UPDATE RECEIVED!');
+      console.log('📨 Data:', JSON.stringify(data, null, 2));
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
       if (data.paymentStatus === 'completed') {
+        console.log('✅ Payment completed successfully');
         setStatus('success');
         setMessage('Payment successful!');
         toast.success('Payment confirmed!');
 
         // Auto-redirect after 2 seconds
         setTimeout(() => {
+          console.log('🔄 Redirecting to order page...');
           navigate(`/orders/${orderId}`);
         }, 2000);
       } else if (data.paymentStatus === 'failed') {
+        console.log('❌ Payment failed');
         setStatus('failed');
         setMessage('Payment failed. Please try again.');
         toast.error('Payment failed');
@@ -56,15 +78,22 @@ export function PaymentVerifyPage() {
     };
 
     socket.on(`order:${orderId}:updated`, handleOrderUpdate);
+    console.log('👂 Listening for event: order:' + orderId + ':updated');
 
     // Trigger simulated payment
     const simulatePayment = async () => {
       try {
-        await api.patch(`/orders/${orderId}/payment`, {
+        console.log('💳 Triggering payment simulation...');
+        console.log('🌐 API Call: PATCH /orders/' + orderId + '/payment');
+
+        const response = await api.patch(`/orders/${orderId}/payment`, {
           success: true, // Can set to false to test failures
         });
+
+        console.log('✅ Payment API call successful:', response.data);
+        console.log('⏳ Waiting for WebSocket update (should arrive in ~2 seconds)...');
       } catch (error) {
-        console.error('Payment simulation error:', error);
+        console.error('❌ Payment simulation error:', error);
         setStatus('failed');
         setMessage('Failed to process payment');
       }
@@ -77,8 +106,10 @@ export function PaymentVerifyPage() {
 
     // Cleanup
     return () => {
+      console.log('🧹 Cleaning up payment verification');
       clearTimeout(timer);
       socket.off(`order:${orderId}:updated`, handleOrderUpdate);
+      socket.offAny();
       socket.emit('unsubscribe:order', orderId);
     };
   }, [orderId, navigate]);

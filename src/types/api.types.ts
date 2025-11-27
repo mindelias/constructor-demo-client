@@ -66,12 +66,16 @@ export interface Product {
   description: string;
   price: number;
   category: string;
-  imageUrl: string;
+  imageUrl?: string; // For backward compatibility
+  images?: string[]; // Backend uses 'images' array
   inventory: number;
+  tags?: string[]; // Backend includes tags
+  features?: Record<string, unknown>; // Backend includes features
   stats: ProductStats;
-  numReviews: number;
+  numReviews?: number; // Optional - may use stats.reviewCount instead
   createdAt: string;
   updatedAt: string;
+  __v?: number; // MongoDB version key
 }
 
  
@@ -114,20 +118,25 @@ export interface Cart {
 // ===========================
 
 export interface ShippingAddress {
+  fullName?: string;
+  address?: string;
   street: string;
   city: string;
   state: string;
-  country: string;
+  postalCode?: string;
   zipCode: string;
+  country: string;
   phone?: string;
 }
 
 export interface OrderItem {
-  product: string | Product;
-  name: string;
+  productId: string | Product; // Backend uses 'productId', not 'product'
+  product?: string | Product; // For backward compatibility
+  name?: string;
   quantity: number;
   price: number;
   imageUrl?: string;
+  _id?: string; // Backend includes this
 }
 
 export type OrderStatus =
@@ -139,17 +148,22 @@ export type OrderStatus =
 
 export interface Order {
   _id: string;
-  user: string | User;
+  userId?: string; // Backend uses 'userId', not 'user'
+  user?: string | User; // For backward compatibility
   items: OrderItem[];
   shippingAddress: ShippingAddress;
-  subtotal: number;
-  tax: number;
-  shippingCost: number;
-  total: number;
+  totalAmount?: number; // Backend uses 'totalAmount', not 'total'
+  total?: number; // For backward compatibility
+  subtotal?: number; // Optional - backend may not return
+  tax?: number; // Optional - backend may not return
+  shippingCost?: number; // Optional - backend may not return
   status: OrderStatus;
-  statusHistory: OrderStatusUpdate[];
+  statusHistory?: OrderStatusUpdate[]; // Optional - backend may not return!
+  paymentMethod?: string; // For payment gateway simulation
+  paymentStatus?: 'pending' | 'completed' | 'failed'; // For payment tracking
   createdAt: string;
   updatedAt: string;
+  __v?: number; // MongoDB version key
 }
 
 export interface OrderStatusUpdate {
@@ -164,6 +178,7 @@ export interface CreateOrderRequest {
     quantity: number;
   }>;
   shippingAddress: ShippingAddress;
+  paymentMethod?: 'credit_card' | 'paypal' | 'cash_on_delivery' | 'simulated'; // For payment simulation
 }
 
 // ===========================

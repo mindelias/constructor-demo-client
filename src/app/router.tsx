@@ -9,6 +9,7 @@ import { CartPage } from '@/pages/cart/CartPage';
 import { CheckoutPage } from '@/pages/checkout/CheckoutPage';
 import { OrderHistoryPage } from '@/pages/orders/OrderHistoryPage';
 import { OrderDetailPage } from '@/pages/orders/OrderDetailPage';
+import { PaymentVerifyPage } from '@/pages/PaymentVerifyPage';
 import { AuthProvider } from '@/features/auth/context/AuthContext';
 
 // Placeholder components - will be built in next steps
@@ -94,6 +95,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <CheckoutPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'payment/verify/:orderId',
+        element: (
+          <ProtectedRoute>
+            <PaymentVerifyPage />
           </ProtectedRoute>
         ),
       },

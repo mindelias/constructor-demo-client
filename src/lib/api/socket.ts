@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import type { OrderUpdateEvent, NotificationEvent } from '@/types/api.types';
 
 let socket: Socket | null = null;
 
@@ -26,15 +27,15 @@ export const initializeSocket = (token?: string): Socket => {
     console.log('Socket.IO connected');
   });
 
-  socket.on('disconnect', (reason) => {
+  socket.on('disconnect', (reason: string) => {
     console.log('Socket.IO disconnected:', reason);
   });
 
-  socket.on('connect_error', (error) => {
+  socket.on('connect_error', (error: Error) => {
     console.error('Socket.IO connection error:', error);
   });
 
-  socket.on('error', (error) => {
+  socket.on('error', (error: Error) => {
     console.error('Socket.IO error:', error);
   });
 
@@ -63,7 +64,7 @@ export const getSocket = (): Socket | null => {
 // Subscribe to order updates
 export const subscribeToOrderUpdates = (
   orderId: string,
-  callback: (data: any) => void
+  callback: (data: OrderUpdateEvent) => void
 ) => {
   if (!socket) return;
 
@@ -74,7 +75,7 @@ export const subscribeToOrderUpdates = (
 // Unsubscribe from order updates
 export const unsubscribeFromOrderUpdates = (
   orderId: string,
-  callback: (data: any) => void
+  callback: (data: OrderUpdateEvent) => void
 ) => {
   if (!socket) return;
 
@@ -83,15 +84,20 @@ export const unsubscribeFromOrderUpdates = (
 };
 
 // Subscribe to general notifications
-export const subscribeToNotifications = (callback: (data: any) => void) => {
+export const subscribeToNotifications = (callback: (data: NotificationEvent) => void) => {
   if (!socket) return;
 
   socket.on('notification', callback);
 };
 
 // Unsubscribe from notifications
-export const unsubscribeFromNotifications = (callback: (data: any) => void) => {
+export const unsubscribeFromNotifications = (callback: (data: NotificationEvent) => void) => {
   if (!socket) return;
 
   socket.off('notification', callback);
 };
+
+
+
+
+

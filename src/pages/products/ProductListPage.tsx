@@ -28,10 +28,6 @@ export function ProductListPage() {
   const { data: productsData, isLoading, error } = useProducts(debouncedFilters);
   const { data: categories } = useCategories();
 
-  console.log('====================================');
-  console.log('ProductDta', productsData);
-  console.log('====================================');
-
   // Update URL params when filters change
   useEffect(() => {
     const params = new URLSearchParams();

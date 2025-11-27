@@ -19,7 +19,7 @@ export const createOrder = async (
 
 // Get user's orders
 export const getOrders = async (): Promise<Order[]> => {
-  const response = await api.get<ApiResponse<Order[]>>('/orders');
+  const response = await api.get<ApiResponse<Order[]>>('/orders/my-orders');
   return response.data.data;
 };
 

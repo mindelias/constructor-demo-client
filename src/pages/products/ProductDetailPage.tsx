@@ -20,9 +20,6 @@ export function ProductDetailPage() {
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    console.log('====================================');
-    console.log('slectedproduct:',product);
-    console.log('====================================');
     if (!product) return;
     addItem(product, quantity);
     toast.success(`${product.name} (${quantity}x) added to cart!`);
